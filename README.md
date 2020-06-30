@@ -18,3 +18,9 @@ Readline support:
 $ sudo apt update && sudo apt install rlwrap
 $ rlwrap scheme
 ```
+
+Edwin editor:
+
+```text
+alias edwin="mit-scheme -eval \"(edit 'console)\""
+```
