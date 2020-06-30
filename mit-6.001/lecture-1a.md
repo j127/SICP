@@ -108,7 +108,7 @@ More examples from the video:
 
 Your procedures get used with all the power and flexibility as primitives.
 
-## Square Root Algorithm
+## Heron of Alexandria's Square Root Method
 
 To find an approximation to $ \sqrt{x} $:
 
