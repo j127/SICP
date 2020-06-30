@@ -9,10 +9,22 @@
   - Example logic programming
   - Register machines
 
+![Summary](../assets/lecture-1a-summary-3-parts.png)
 
-## Part 2
+## Primitive Elements
+
+- Procedures: `+`, `*`, `<`, `=` -- they aren't primitives, but we can use them like primitives. We aren't going to look inside.
+- Data: `23`, `1.738`
 
 3 is a symbol that represents the idea of 3.
+
+## Means of Combination
+
+Procedures:
+
+- `()` (composition)
+- `cond`
+- `if`
 
 This is called a combination:
 
@@ -32,44 +44,7 @@ The string `(+ 3 (* 5 6) 8 2)` represents [this tree](http://www.plantuml.com/pl
 
 ![tree](../assets/lecture-1a-combination-tree.png)
 
-## `define`
-
-```scheme
-(define x 10)
-(+ x 1)
-;=> 11
-```
-
-## Procedures
-
-Instead of `(* 2 2)` and `(* 10 10)`, you define abstractions of those procedures. `lambda` makes a procedure.
-
-```scheme
-; no parens around `square`
-(define square (lambda (x) (* x x)))
-```
-
-Syntactic sugar (note the parens around the symbol):
-
-```scheme
-; parens around square
-(define (square x) (* x x))
-```
-
-More examples from the video:
-
-```scheme
-(define (average x y)
-  (/ (+ x y) 2))
-
-(define (mean-square x y)
-  (average (square x)
-           (square y)))
-```
-
-Your procedures get used with all the power and flexibility as primitives.
-
-## Conditionals
+Conditional procedures (`cond`, `if`):
 
 ```scheme
 (define (abs x)
@@ -88,6 +63,51 @@ Or use `if` for one condition:
       x))
 ```
 
+## Means of Abstraction (`define`)
+
+```scheme
+(define x 10)
+(+ x 1)
+;=> 11
+```
+
+Instead of hard-coding everything like `(* 2 2)` and `(* 10 10)`, you define abstractions of those procedures. `lambda` makes a procedure.
+
+```scheme
+; no parens around `square`
+(define square (lambda (x) (* x x)))
+```
+
+Syntactic sugar (note the parens around the symbol):
+
+```scheme
+; parens around square
+(define (square x) (* x x))
+```
+
+There is a difference between these:
+
+```scheme
+(define a (+ 5 5)) ; Value: 10
+
+(define (a) (+ 5 5)) ; Value: #[compound-procedure num a]
+```
+
+You can write `(a)` on the latter (the procedure) but you can't write `(a)` on the former, because it isn't applicable.
+
+More examples from the video:
+
+```scheme
+(define (average x y)
+  (/ (+ x y) 2))
+
+(define (mean-square x y)
+  (average (square x)
+           (square y)))
+```
+
+Your procedures get used with all the power and flexibility as primitives.
+
 ## Square Root Algorithm
 
 To find an approximation to $ \sqrt{x} $:
@@ -98,6 +118,9 @@ To find an approximation to $ \sqrt{x} $:
 - use 1 as an initial guess
 
 ```scheme
+(define (average x y)
+  (/ (+ x y) 2))
+
 (define (improve guess x)
   (average guess (/ x guess)))
 
@@ -106,6 +129,7 @@ To find an approximation to $ \sqrt{x} $:
      .001))
 
 (define (try guess x)
+  ; base case
   (if (good-enough? guess x)
       guess
       (try (improve guess x) x)))
@@ -113,8 +137,26 @@ To find an approximation to $ \sqrt{x} $:
 (define (sqrt x) (try 1 x))
 ```
 
-The [tree](http://www.plantuml.com/plantuml/uml/BSn12WKX2CRnlQTeBRmplAxYa3GjoiOicDkFH2lbpuyl3YErMbggr073UDG0CPY-W7wpIFfnavdllmSlT8tzE9sal5MfNMNn0OkLCaFabixm1m00):
+[Definitions](http://www.plantuml.com/plantuml/uml/BSn12WKX2CRnlQTeBRmplAxYa3GjoiOicDkFH2lbpuyl3YErMbggr073UDG0CPY-W7wpIFfnavdllmSlT8tzE9sal5MfNMNn0OkLCaFabixm1m00):
 
 (Note that `try` also references itself, but I'm not sure how to add an arrow in plantuml.)
 
 ![square root procedure tree](../assets/lecture-1a-tree-square-algorithm.png)
+
+He packages everything into a single black-box implementation. He calls this way of packaging internals inside of a definition _block structure_.
+
+```scheme
+;; His procedure doesn't work by itself in my version of Scheme, because
+;; `average` isn't defined. I added it separately.
+(define (sqrt x)
+  (define (improve guess)
+    (average guess (/ x guess)))
+  (define (good-enough? guess)
+    (< (abs (- (square guess) x))
+       .001))
+  (define (try guess)
+    (if (good-enough? guess)
+        guess
+        (try (improve guess))))
+  (try 1))
+```
